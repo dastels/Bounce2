@@ -34,7 +34,7 @@ bool Debouncer::update()
 
     unsetStateFlag(CHANGED_STATE);
 #ifdef BOUNCE_LOCK_OUT
-    
+
     // Ignore everything if we are locked out
     if (millis() - previous_millis >= interval_millis) {
         bool currentState = readCurrentState();
@@ -43,7 +43,7 @@ bool Debouncer::update()
             changeState();
         }
     }
-    
+
 
 #elif defined BOUNCE_WITH_PROMPT_DETECTION
     // Read the state of the switch port into a temporary variable.
@@ -69,12 +69,12 @@ bool Debouncer::update()
         toggleStateFlag(UNSTABLE_STATE);
         previous_millis = millis();
     }
-    
-    
+
+
 #else
     // Read the state of the switch in a temporary variable.
     bool currentState = readCurrentState();
-    
+
 
     // If the reading is different from last reading, reset the debounce counter
     if ( currentState != getStateFlag(UNSTABLE_STATE) ) {
@@ -86,16 +86,16 @@ bool Debouncer::update()
             // If it is different from last state, set the STATE_CHANGED flag
             if (currentState != getStateFlag(DEBOUNCED_STATE) ) {
                 previous_millis = millis();
-                 
+
 
                  changeState();
             }
         }
 
-    
+
 #endif
 
-		return  changed(); 
+		return  changed();
 
 }
 
@@ -141,7 +141,7 @@ Bounce::Bounce()
 
 void Bounce::attach(int pin) {
     this->pin = pin;
-    
+
     // SET INITIAL STATE
     begin();
 }
@@ -152,4 +152,16 @@ void Bounce::attach(int pin, int mode){
 }
 
 
+////////////////////////
+// PredicateDebouncer //
+////////////////////////
 
+
+PredicateDebouncer::PredicateDebouncer()
+  : predicate(NULL)
+{}
+
+void PredicateDebouncer::setPredicate(bool (*f)())
+{
+  predicate = f;
+}

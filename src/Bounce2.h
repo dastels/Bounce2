@@ -85,15 +85,15 @@ public:
 
 	    /**
     @brief  Sets the debounce interval in milliseconds.
-            
+
     @param    interval_millis
     		The interval time in milliseconds.
-     
+
      */
 	void interval(uint16_t interval_millis);
 
 	/*!
-    @brief   Updates the pin's state. 
+    @brief   Updates the pin's state.
 
     Because Bounce does not use interrupts, you have to "update" the object before reading its value and it has to be done as often as possible (that means to include it in your loop()). Only call update() once per loop().
 
@@ -130,10 +130,10 @@ public:
   bool changed( ) const { return getStateFlag(CHANGED_STATE); }
 
       /**
-     @brief Returns the duration in milliseconds of the current state. 
+     @brief Returns the duration in milliseconds of the current state.
 
      Is reset to 0 once the pin rises ( rose() ) or falls ( fell() ).
-    
+
       @return The duration in milliseconds (unsigned long) of the current state.
      */
 
@@ -141,11 +141,11 @@ public:
 
 
   /**
-     @brief Returns the duration in milliseconds of the previous state. 
+     @brief Returns the duration in milliseconds of the previous state.
 
      Takes the values of duration() once the pin changes state.
-    
-      @return The duration in milliseconds (unsigned long) of the previous state. 
+
+      @return The duration in milliseconds (unsigned long) of the previous state.
      */
   unsigned long previousDuration() const;
 
@@ -163,7 +163,7 @@ protected:
 
 /**
 @brief The Debouncer:Bounce class. Links the Deboucing class to a hardware pin.  This class is odly named, but it will be kept that so it stays compatible with previous code.
-     
+
      */
 class Bounce : public Debouncer
 {
@@ -186,7 +186,7 @@ public:
 
 /*!
     @brief  Attach to a pin and sets that pin's mode (INPUT, INPUT_PULLUP or OUTPUT).
-            
+
     @param    pin
               The pin that is to be debounced.
     @param    mode
@@ -203,11 +203,11 @@ public:
     attach(pin);
     interval(interval_millis);
   }
- 
+
 
  /**
   @brief Return pin that this Bounce is attached to
-  
+
   @return integer identifier of the coupled pin
   */
   inline int getPin() const {
@@ -257,7 +257,7 @@ namespace Bounce2 {
 
 class Button : public Bounce{
 protected:
-    bool stateForPressed = 1; // 
+    bool stateForPressed = 1; //
   public:
 	/*!
     @brief  Create an instance of the Button class. By default, the pressed state is matched to a HIGH electrical level.
@@ -273,7 +273,7 @@ protected:
 
     /*!
     @brief Set the electrical state (HIGH/LOW) that corresponds to a physical press. By default, the pressed state is matched to a HIGH electrical level.
-            
+
     @param    state
               The electrical state (HIGH/LOW) that corresponds to a physical press.
 
@@ -283,7 +283,7 @@ protected:
   }
 
   /*!
-  @brief Get the electrical state (HIGH/LOW) that corresponds to a physical press. 
+  @brief Get the electrical state (HIGH/LOW) that corresponds to a physical press.
   */
   inline bool getPressedState() const {
     return stateForPressed;
@@ -297,14 +297,14 @@ protected:
   };
 
     /*!
-    @brief Returns true if the button was physically pressed          
+    @brief Returns true if the button was physically pressed
 */
   inline bool pressed() const {
     return changed() && isPressed();
   };
 
         /*!
-    @brief Returns true if the button was physically released          
+    @brief Returns true if the button was physically released
 */
   inline bool released() const {
     return  changed() && !isPressed();
@@ -312,5 +312,48 @@ protected:
 
 };
 };
+
+
+/**
+@brief The Debouncer:PredicateDebouncer class. Links the Deboucing class to a predicate function.
+
+     */
+class PredicateDebouncer : public Debouncer //
+{
+
+public:
+
+/*!
+    @brief  Create an instance of the PredicateBouncer class.
+
+    @code
+
+    // Create an instance of the Bounce class.
+    PredicateBouncer() button;
+
+    @endcode
+*/
+  PredicateDebouncer();
+
+/*!
+    @brief  Set the predicate to debounce
+
+    @param    f
+              The predicate that is to be debounced.
+*/
+  void setPredicate(bool (*f)());
+
+  PredicateDebouncer(bool (*f)(), unsigned long interval_millis = 10) : Debouncer() {
+    setPredicate(f);
+    interval(interval_millis);
+  }
+
+protected:
+
+  bool (*predicate)();
+  virtual bool readCurrentState() { return predicate(); }
+
+};
+
 
 #endif
